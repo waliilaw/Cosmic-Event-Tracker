@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Rocket, User, LogOut, Sparkles } from 'lucide-react'
+import { User, LogOut, Sparkles } from 'lucide-react'
 
 interface HeaderProps {
   selectedCount?: number

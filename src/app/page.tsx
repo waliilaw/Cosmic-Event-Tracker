@@ -14,7 +14,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { NEO, NEOResponse, NEOFilter } from '@/types/neo'
 import { nasaApi, NASAApiService } from '@/services/nasa-api'
 import { addDays, format } from 'date-fns'
-import { AlertCircle, Calendar, RefreshCw, Sparkles, TrendingUp, Rocket } from 'lucide-react'
+import { AlertCircle, Calendar, RefreshCw, Sparkles, TrendingUp } from 'lucide-react'
 
 export default function Home() {
   const { user, loading: authLoading, isConfigured } = useAuth()
