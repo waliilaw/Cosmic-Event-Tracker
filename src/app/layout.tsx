@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LenisProvider } from "@/components/LenisProvider";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -11,7 +12,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "Cosmic Event Tracker",
-  description: "Track Near-Earth Objects and cosmic events using NASA's Open APIs",
+  description: "Track Near-Earth Objects and cosmic events using NASA's Open APIs - Developed by Wali",
 };
 
 export default function RootLayout({
@@ -20,13 +21,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="lenis">
       <body
-        className={`${spaceGrotesk.variable} font-sans antialiased bg-slate-50`}
+        className={`${spaceGrotesk.variable} font-sans antialiased`}
       >
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <LenisProvider>
+          <AuthProvider>
+            <div className="content-wrapper">
+              {children}
+            </div>
+          </AuthProvider>
+        </LenisProvider>
       </body>
     </html>
   );

@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { format } from 'date-fns'
 import {
   Dialog,
@@ -42,22 +43,35 @@ export const NEODetailModal: React.FC<NEODetailModalProps> = ({
   const closestApproach = NASAApiService.getClosestApproach(neo)
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center space-x-3">
-            <span className="text-xl">{neo.name}</span>
-            {neo.is_potentially_hazardous_asteroid && (
-              <Badge variant="destructive" className="flex items-center space-x-1">
-                <AlertTriangle className="h-3 w-3" />
-                <span>Potentially Hazardous</span>
-              </Badge>
-            )}
-          </DialogTitle>
-          <DialogDescription>
-            Detailed information about this Near-Earth Object
-          </DialogDescription>
-        </DialogHeader>
+    <AnimatePresence>
+      {isOpen && (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+          <DialogContent className="max-w-5xl max-h-[90vh] premium-card shadow-premium-xl border-0">
+            <div className="max-h-[75vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-slate-100 pr-2">
+              <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+            >
+              <DialogHeader className="pb-6">
+                <DialogTitle className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-2xl font-bold text-slate-900 font-space-grotesk">
+                      {neo.name}
+                    </span>
+                    {neo.is_potentially_hazardous_asteroid && (
+                      <Badge className="bg-red-50 text-red-700 border-red-200">
+                        <AlertTriangle className="h-3 w-3 mr-1" />
+                        Potentially Hazardous
+                      </Badge>
+                    )}
+                  </div>
+                </DialogTitle>
+                <DialogDescription className="text-slate-600 italic">
+                  Detailed information about this Near-Earth Object
+                </DialogDescription>
+              </DialogHeader>
 
         <div className="space-y-6">
           {/* Basic Information */}
@@ -239,14 +253,18 @@ export const NEODetailModal: React.FC<NEODetailModalProps> = ({
           <div className="pt-4 border-t">
             <Button
               onClick={() => window.open(neo.nasa_jpl_url, '_blank')}
-              className="flex items-center space-x-2"
+              className="bg-slate-900 hover:bg-slate-800 text-white flex items-center space-x-2"
             >
               <ExternalLink className="h-4 w-4" />
               <span>View on NASA JPL</span>
             </Button>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+            </motion.div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </AnimatePresence>
   )
 }

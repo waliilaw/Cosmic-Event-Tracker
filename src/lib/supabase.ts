@@ -8,7 +8,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Check if Supabase is properly configured
 export const isSupabaseConfigured = () => {
-  return supabaseUrl !== 'https://demo.supabase.co' && 
-         supabaseKey !== 'demo-key' &&
-         supabaseUrl.includes('supabase.co')
+  const hasRealUrl = supabaseUrl !== 'https://demo.supabase.co' && supabaseUrl.includes('supabase.co')
+  const hasRealKey = supabaseKey !== 'demo-key' && supabaseKey.length > 20
+  return hasRealUrl && hasRealKey
 }

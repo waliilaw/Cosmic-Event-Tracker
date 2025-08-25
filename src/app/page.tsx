@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
 import { Header } from '@/components/Header'
 import { AuthForm } from '@/components/auth/AuthForm'
@@ -13,7 +14,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { NEO, NEOResponse, NEOFilter } from '@/types/neo'
 import { nasaApi, NASAApiService } from '@/services/nasa-api'
 import { addDays, format } from 'date-fns'
-import { AlertCircle, Calendar, RefreshCw } from 'lucide-react'
+import { AlertCircle, Calendar, RefreshCw, Sparkles, TrendingUp, Rocket } from 'lucide-react'
 
 export default function Home() {
   const { user, loading: authLoading, isConfigured } = useAuth()
@@ -22,6 +23,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [selectedNeos, setSelectedNeos] = useState<NEO[]>([])
   const [detailNeo, setDetailNeo] = useState<NEO | null>(null)
+  const [displayCount, setDisplayCount] = useState(10) // Show only 10 cards initially
   const [currentDateRange, setCurrentDateRange] = useState({
     start: new Date(),
     days: 7
@@ -79,6 +81,7 @@ export default function Home() {
       start: new Date(),
       days: 7
     })
+    setDisplayCount(10) // Reset display count on refresh
     fetchNEOs(new Date(), 7)
   }
 
@@ -165,77 +168,134 @@ export default function Home() {
   // Show authentication form only if Supabase is configured but user is not signed in
   if (isConfigured && !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+      <div className="min-h-screen bg-slate-50">
         <Header />
-        <div className="container mx-auto px-4 py-12">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="container mx-auto px-4 py-12"
+        >
           <div className="max-w-md mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Welcome to Cosmic Event Tracker</h2>
-              <p className="text-gray-600">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-center mb-8"
+            >
+              <h2 className="text-3xl font-bold text-slate-900 mb-4 font-space-grotesk">
+                Welcome to Cosmic Event Tracker
+              </h2>
+              <p className="text-slate-600 italic">
                 Sign in to start tracking Near-Earth Objects and cosmic events using NASA&apos;s data.
               </p>
-            </div>
-            <AuthForm />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <AuthForm />
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <Header 
         selectedCount={selectedNeos.length}
         onCompareClick={handleCompareClick}
       />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-6 py-8 max-w-7xl">
         {/* Demo Mode Banner */}
-        {!isConfigured && (
-          <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="bg-blue-100 p-2 rounded-full">
-                  <AlertCircle className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-blue-900">Demo Mode Active</h3>
-                  <p className="text-sm text-blue-700">
-                    Exploring NASA&apos;s NEO data without authentication. Set up Supabase for full functionality.
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.open('https://supabase.com', '_blank')}
-                className="border-blue-200 text-blue-700 hover:bg-blue-50"
-              >
-                Setup Auth
-              </Button>
-            </div>
-          </div>
-        )}
-        
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Near-Earth Objects</h1>
-              <p className="text-gray-600 flex items-center space-x-2">
-                <Calendar className="h-4 w-4" />
-                <span>
-                  Showing data from {format(currentDateRange.start, 'MMM dd, yyyy')} onwards
-                </span>
-              </p>
-            </div>
-            <Button
-              onClick={handleRefresh}
-              variant="outline"
-              className="flex items-center space-x-2"
+        <AnimatePresence>
+          {!isConfigured && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mb-6 glass-card rounded-2xl p-6 shadow-premium-lg"
             >
-              <RefreshCw className="h-4 w-4" />
-              <span>Refresh</span>
-            </Button>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center animate-float">
+                    <Sparkles className="h-6 w-6 text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-slate-900 font-space-grotesk text-lg">Demo Mode Active</h3>
+                    <p className="text-sm text-slate-700 italic font-medium">
+                      Exploring NASA&apos;s NEO data without authentication. Set up Supabase for full functionality.
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open('https://supabase.com', '_blank')}
+                  className="glass-input border-slate-300 text-slate-800 hover:bg-white/80 font-medium"
+                >
+                  Setup Auth
+                </Button>
+        </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-8"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h1 className="text-5xl font-bold premium-text mb-4 font-space-grotesk">
+                Near-Earth Objects
+              </h1>
+              <div className="flex items-center space-x-6 text-slate-700">
+                <div className="flex items-center space-x-2 glass-card px-4 py-2 rounded-xl">
+                  <Calendar className="h-5 w-5 text-slate-600" />
+                  <span className="text-sm font-semibold text-visible">
+                    Showing data from {format(currentDateRange.start, 'MMM dd, yyyy')} onwards
+                  </span>
+                </div>
+                {filteredAndSortedNeos.length > 0 && (
+                  <div className="flex items-center space-x-2 glass-card px-4 py-2 rounded-xl">
+                    <TrendingUp className="h-5 w-5 text-slate-600" />
+                    <span className="text-sm font-semibold text-visible">
+                      {filteredAndSortedNeos.length} objects found
+                    </span>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
+                <Button
+                  onClick={handleRefresh}
+                  variant="outline"
+                  className="flex items-center space-x-2 glass-input border-slate-300 text-visible hover:bg-white/90 hover:text-visible hover:border-slate-400 font-medium shadow-premium"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  <span>Refresh Data</span>
+                </Button>
+              </motion.div>
+            </motion.div>
           </div>
 
           <FilterControls
@@ -243,77 +303,169 @@ export default function Home() {
             onFilterChange={setFilter}
             onReset={resetFilters}
           />
-        </div>
+        </motion.div>
 
-        {error && (
-          <Card className="mb-6 border-red-200 bg-red-50">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2 text-red-800">
-                <AlertCircle className="h-5 w-5" />
-                <span className="font-medium">Error loading data:</span>
-              </div>
-              <p className="text-red-700 mt-1">{error}</p>
-              <Button
-                onClick={handleRefresh}
-                variant="outline"
-                size="sm"
-                className="mt-3"
-              >
-                Try Again
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <Card className="mb-6 border-red-200 bg-red-50">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-2 text-red-800 mb-2">
+                    <AlertCircle className="h-5 w-5" />
+                    <span className="font-semibold">Error loading data:</span>
+                  </div>
+                  <p className="text-red-700 mb-4">{error}</p>
+                  <Button
+                    onClick={handleRefresh}
+                    variant="outline"
+                    size="sm"
+                    className="border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800 hover:border-red-300 font-medium"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Try Again
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {loading && neos.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center py-16"
+          >
             <LoadingSpinner size="lg" className="mb-4" />
-            <p className="text-gray-600">Loading Near-Earth Objects...</p>
-          </div>
+            <p className="text-slate-600 font-medium">Loading Near-Earth Objects...</p>
+            <p className="text-slate-500 text-sm mt-2 italic">Fetching data from NASA&apos;s database</p>
+          </motion.div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {filteredAndSortedNeos.map(neo => (
-                <NEOCard
-                  key={neo.id}
-                  neo={neo}
-                  isSelected={selectedNeos.some(selected => selected.id === neo.id)}
-                  onSelect={handleNEOSelect}
-                  onViewDetails={handleViewDetails}
-                />
-              ))}
-            </div>
+            <motion.div 
+              layout
+              transition={{ type: "spring", stiffness: 100, damping: 25 }}
+              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-12"
+            >
+              <AnimatePresence mode="wait">
+                {filteredAndSortedNeos.slice(0, displayCount).map((neo, index) => (
+                  <motion.div
+                    key={neo.id}
+                    layout
+                    layoutId={neo.id}
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    animate={{ 
+                      opacity: 1, 
+                      scale: 1, 
+                      y: 0
+                    }}
+                    exit={{ 
+                      opacity: 0, 
+                      scale: 0.95, 
+                      y: -10
+                    }}
+                    transition={{ 
+                      duration: 0.3,
+                      delay: index * 0.02,
+                      ease: [0.25, 0.46, 0.45, 0.94],
+                      layout: { 
+                        duration: 0.4,
+                        ease: [0.25, 0.46, 0.45, 0.94]
+                      }
+                    }}
+                  >
+                    <NEOCard
+                      neo={neo}
+                      isSelected={selectedNeos.some(selected => selected.id === neo.id)}
+                      onSelect={handleNEOSelect}
+                      onViewDetails={handleViewDetails}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
 
-            {filteredAndSortedNeos.length === 0 && !loading && (
-              <div className="text-center py-12">
-                <p className="text-gray-500 mb-4">
-                  No Near-Earth Objects found matching your criteria.
-                </p>
-                <Button onClick={resetFilters} variant="outline">
-                  Reset Filters
-                </Button>
-              </div>
-            )}
+            <AnimatePresence>
+              {filteredAndSortedNeos.length === 0 && !loading && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="text-center py-16"
+                >
+                  <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Sparkles className="h-8 w-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2 font-space-grotesk">
+                    No objects found
+                  </h3>
+                  <p className="text-slate-500 mb-6 italic">
+                    No Near-Earth Objects match your current criteria.
+                  </p>
+                  <Button 
+                    onClick={resetFilters} 
+                    variant="outline"
+                    className="border-slate-200 text-slate-700 hover:bg-slate-50"
+                  >
+                    Reset Filters
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            {filteredAndSortedNeos.length > 0 && (
-              <div className="text-center">
+            {/* Load More Button */}
+            <AnimatePresence>
+              {filteredAndSortedNeos.length > displayCount && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="text-center"
+                >
+                  <Button
+                    onClick={() => setDisplayCount(prev => prev + 10)}
+                    variant="outline"
+                    size="lg"
+                    className="glass-input border-slate-300 text-slate-800 hover:bg-white/80 font-semibold px-8 py-4 shadow-premium"
+                  >
+                    <TrendingUp className="h-5 w-5 mr-2" />
+                    Load More Objects ({filteredAndSortedNeos.length - displayCount} remaining)
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Load More Data Button (for fetching additional dates) */}
+            {filteredAndSortedNeos.length > 0 && displayCount >= filteredAndSortedNeos.length && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center mt-6"
+              >
                 <Button
                   onClick={handleLoadMore}
                   variant="outline"
                   size="lg"
                   disabled={loading}
-                  className="px-8"
+                  className="glass-input border-slate-300 text-slate-800 hover:bg-white/80 font-medium px-8 py-3"
                 >
                   {loading ? (
                     <>
                       <LoadingSpinner size="sm" className="mr-2" />
-                      Loading...
+                      Loading more data...
                     </>
                   ) : (
-                    'Load More'
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Load Next 7 Days
+                    </>
                   )}
                 </Button>
-              </div>
+              </motion.div>
             )}
           </>
         )}
@@ -326,13 +478,41 @@ export default function Home() {
       />
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 mt-16">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-400">
-            Developed by @KuldipPatel • Powered by NASA Open APIs
-          </p>
+      <motion.footer 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="glass-header mt-20 py-10"
+      >
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="mb-6"
+            >
+              <div className="flex items-center justify-center space-x-3 mb-4">
+              
+                <span className="text-2xl font-bold premium-text font-space-grotesk">Cosmic Event Tracker</span>
+              </div>
+              <p className="text-visible-muted text-lg italic font-medium">
+                Developed by <span className="text-visible font-bold">@Wali</span> • Powered by NASA Open APIs
+              </p>
+            </motion.div>
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="flex items-center justify-center space-x-8 text-sm text-slate-600 font-medium"
+            >
+              <span className="glass-card px-4 py-2 rounded-xl">Real-time NEO data</span>
+              <span className="glass-card px-4 py-2 rounded-xl">Interactive visualizations</span>
+              <span className="glass-card px-4 py-2 rounded-xl">Modern web technology</span>
+            </motion.div>
+          </div>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   )
 }

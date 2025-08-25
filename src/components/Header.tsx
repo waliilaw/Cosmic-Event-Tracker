@@ -28,36 +28,31 @@ export const Header: React.FC<HeaderProps> = ({ selectedCount = 0, onCompareClic
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50"
+      className="glass-header sticky top-0 z-50 rounded-br-4xl"
     >
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo Section */}
           <motion.div 
-            className="flex items-center space-x-3"
+            className="flex items-center space-x-3 ml-4"
             whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            onClick={() => {window.open('/')}}
           >
             <div className="relative">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center"
-              >
-                <Rocket className="h-5 w-5 text-white" />
-              </motion.div>
+     
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="absolute -top-1 -right-1 w-3 h-3 bg-sky-500 rounded-full"
+                className="absolute -top-1 -right-1 w-4 h-4 bg-blue-200 rounded-xl shadow-premium animate-float"
               />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900 font-space-grotesk">
-                Cosmic Event Tracker
+              <h1 className="text-2xl font-bold premium-text font-space-grotesk">
+               CMT
               </h1>
-              <p className="text-sm text-slate-500 italic font-light">
-                Near-Earth Objects & Space Events
+              <p className="text-sm text-slate-600 italic font-medium">
+                Near-Earth Objects
               </p>
             </div>
           </motion.div>
@@ -87,7 +82,7 @@ export const Header: React.FC<HeaderProps> = ({ selectedCount = 0, onCompareClic
                 <Button
                   onClick={onCompareClick}
                   size="sm"
-                  className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 font-medium shadow-cosmic"
+                  className="glass-button text-white px-6 py-2 font-medium shadow-premium-lg"
                 >
                   Compare Objects
                 </Button>
