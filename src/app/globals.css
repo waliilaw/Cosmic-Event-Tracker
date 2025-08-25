@@ -55,9 +55,15 @@
   --radius: 1rem;
 }
 
-/* Lenis smooth scrolling */
+/* Enhanced Lenis smooth scrolling */
 html.lenis {
   height: auto;
+  overflow-x: hidden;
+}
+
+html.lenis, body {
+  height: auto;
+  overflow-x: hidden;
 }
 
 .lenis.lenis-smooth {
@@ -66,6 +72,22 @@ html.lenis {
 
 .lenis.lenis-smooth [data-lenis-prevent] {
   overscroll-behavior: contain;
+}
+
+/* Fix scroll jitter */
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Improve rendering performance */
+.content-wrapper {
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @layer base {
@@ -278,15 +300,18 @@ html.lenis {
   
   /* Premium hover effects */
   .premium-hover {
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    backface-visibility: hidden;
+    perspective: 1000px;
   }
   
   .premium-hover:hover {
-    transform: translateY(-4px);
+    transform: translateY(-2px);
     box-shadow: 
-      0 20px 60px rgba(15, 20, 25, 0.12),
-      0 8px 24px rgba(15, 20, 25, 0.08),
+      0 16px 48px rgba(90, 93, 97, 0.08),
+      0 6px 20px rgba(79, 81, 85, 0.06),
       inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border-color: rgba(148, 163, 184, 0.4);
   }
   
   /* Enhanced checkbox visibility */

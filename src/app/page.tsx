@@ -348,10 +348,10 @@ export default function Home() {
           <>
             <motion.div 
               layout
-              transition={{ type: "spring", stiffness: 100, damping: 25 }}
+              transition={{ type: "spring", stiffness: 80, damping: 30 }}
               className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-12"
             >
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="popLayout">
                 {filteredAndSortedNeos.slice(0, displayCount).map((neo, index) => (
                   <motion.div
                     key={neo.id}
@@ -369,11 +369,11 @@ export default function Home() {
                       y: -10
                     }}
                     transition={{ 
-                      duration: 0.3,
-                      delay: index * 0.02,
+                      duration: 0.25,
+                      delay: index * 0.01,
                       ease: [0.25, 0.46, 0.45, 0.94],
                       layout: { 
-                        duration: 0.4,
+                        duration: 0.3,
                         ease: [0.25, 0.46, 0.45, 0.94]
                       }
                     }}
@@ -430,7 +430,7 @@ export default function Home() {
                     onClick={() => setDisplayCount(prev => prev + 10)}
                     variant="outline"
                     size="lg"
-                    className="glass-input border-slate-300 text-slate-800 hover:bg-white/80 font-semibold px-8 py-4 shadow-premium"
+                    className="glass-input border-slate-300 text-slate-800 hover:bg-white/80 font-semibold px-8 py-4 shadow-premium hover:text-black"
                   >
                     <TrendingUp className="h-5 w-5 mr-2" />
                     Load More Objects ({filteredAndSortedNeos.length - displayCount} remaining)
@@ -482,7 +482,7 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="glass-header mt-20 py-10"
+        className="glass-header mt-20 py-10 rounded-t-full"
       >
         <div className="container mx-auto px-4">
           <div className="text-center">
