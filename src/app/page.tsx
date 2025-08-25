@@ -16,7 +16,7 @@ import { addDays, format } from 'date-fns'
 import { AlertCircle, Calendar, RefreshCw } from 'lucide-react'
 
 export default function Home() {
-  const { user, loading: authLoading } = useAuth()
+  const { user, loading: authLoading, isConfigured } = useAuth()
   const [neos, setNeos] = useState<NEO[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -58,10 +58,12 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    if (user) {
+    // Load NEO data regardless of authentication status for demo purposes
+    // In production, you might want to require authentication
+    if (!authLoading) {
       fetchNEOs(currentDateRange.start, currentDateRange.days)
     }
-  }, [user, fetchNEOs, currentDateRange.start, currentDateRange.days])
+  }, [authLoading, fetchNEOs, currentDateRange.start, currentDateRange.days])
 
   const handleLoadMore = () => {
     const nextStartDate = addDays(currentDateRange.start, currentDateRange.days)
@@ -160,7 +162,8 @@ export default function Home() {
     )
   }
 
-  if (!user) {
+  // Show authentication form only if Supabase is configured but user is not signed in
+  if (isConfigured && !user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
         <Header />
@@ -169,7 +172,7 @@ export default function Home() {
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Welcome to Cosmic Event Tracker</h2>
               <p className="text-gray-600">
-                Sign in to start tracking Near-Earth Objects and cosmic events using NASA's data.
+                Sign in to start tracking Near-Earth Objects and cosmic events using NASA&apos;s data.
               </p>
             </div>
             <AuthForm />
@@ -187,6 +190,33 @@ export default function Home() {
       />
       
       <main className="container mx-auto px-4 py-8">
+        {/* Demo Mode Banner */}
+        {!isConfigured && (
+          <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="bg-blue-100 p-2 rounded-full">
+                  <AlertCircle className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-blue-900">Demo Mode Active</h3>
+                  <p className="text-sm text-blue-700">
+                    Exploring NASA&apos;s NEO data without authentication. Set up Supabase for full functionality.
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open('https://supabase.com', '_blank')}
+                className="border-blue-200 text-blue-700 hover:bg-blue-50"
+              >
+                Setup Auth
+              </Button>
+            </div>
+          </div>
+        )}
+        
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>

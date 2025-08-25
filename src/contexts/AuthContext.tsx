@@ -1,23 +1,18 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { supabase, mockAuth } from '@/lib/supabase'
-import { User } from '@supabase/supabase-js'
-
-interface MockUser {
-  id: string
-  email: string
-  user_metadata: {
-    name: string
-  }
-}
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
+import { User, AuthError } from '@supabase/supabase-js'
 
 interface AuthContextType {
-  user: User | MockUser | null
-  signIn: (email: string, password: string) => Promise<any>
-  signUp: (email: string, password: string) => Promise<any>
+  user: User | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  signIn: (email: string, password: string) => Promise<{data?: any; error?: AuthError | null}>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  signUp: (email: string, password: string) => Promise<{data?: any; error?: AuthError | null}>
   signOut: () => Promise<void>
   loading: boolean
+  isConfigured: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -31,71 +26,94 @@ export const useAuth = () => {
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | MockUser | null>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-
-  const isSupabaseConfigured = process.env.NEXT_PUBLIC_SUPABASE_URL && 
-    process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://your-project.supabase.co'
+  const configured = isSupabaseConfigured()
 
   useEffect(() => {
-    if (isSupabaseConfigured) {
-      // Get initial session
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        setUser(session?.user ?? null)
-        setLoading(false)
-      })
-
-      // Listen for auth changes
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange((_event, session) => {
-        setUser(session?.user ?? null)
-        setLoading(false)
-      })
-
-      return () => subscription.unsubscribe()
-    } else {
-      // Use mock auth for demo
-      const mockUser = localStorage.getItem('mockUser')
-      if (mockUser) {
-        setUser(JSON.parse(mockUser))
-      }
+    if (!configured) {
       setLoading(false)
+      return
     }
-  }, [isSupabaseConfigured])
+
+    // Get initial session
+    const getSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        if (error) {
+          console.error('Error getting session:', error)
+        } else {
+          setUser(session?.user ?? null)
+        }
+      } catch (error) {
+        console.error('Error in getSession:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    getSession()
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [configured])
 
   const signIn = async (email: string, password: string) => {
-    if (isSupabaseConfigured) {
-      return await supabase.auth.signInWithPassword({ email, password })
-    } else {
-      const result = await mockAuth.signIn(email, password)
-      if (result.data?.user) {
-        localStorage.setItem('mockUser', JSON.stringify(result.data.user))
-        setUser(result.data.user)
+    if (!configured) {
+      return {
+        error: {
+          message: 'Supabase is not configured. Please set up your Supabase project and add the environment variables.',
+          name: 'ConfigurationError'
+        } as AuthError
       }
+    }
+
+    try {
+      const result = await supabase.auth.signInWithPassword({ email, password })
       return result
+    } catch {
+      return {
+        error: {
+          message: 'An unexpected error occurred during sign in',
+          name: 'SignInError'
+        } as AuthError
+      }
     }
   }
 
   const signUp = async (email: string, password: string) => {
-    if (isSupabaseConfigured) {
-      return await supabase.auth.signUp({ email, password })
-    } else {
-      const result = await mockAuth.signUp(email, password)
-      if (result.data?.user) {
-        localStorage.setItem('mockUser', JSON.stringify(result.data.user))
-        setUser(result.data.user)
+    if (!configured) {
+      return {
+        error: {
+          message: 'Supabase is not configured. Please set up your Supabase project and add the environment variables.',
+          name: 'ConfigurationError'
+        } as AuthError
       }
+    }
+
+    try {
+      const result = await supabase.auth.signUp({ email, password })
       return result
+    } catch {
+      return {
+        error: {
+          message: 'An unexpected error occurred during sign up',
+          name: 'SignUpError'
+        } as AuthError
+      }
     }
   }
 
   const signOut = async () => {
-    if (isSupabaseConfigured) {
+    if (configured) {
       await supabase.auth.signOut()
-    } else {
-      localStorage.removeItem('mockUser')
-      setUser(null)
     }
   }
 
@@ -105,6 +123,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signUp,
     signOut,
     loading,
+    isConfigured: configured,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

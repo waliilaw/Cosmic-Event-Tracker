@@ -53,7 +53,7 @@ export const NEOComparison: React.FC<NEOComparisonProps> = ({ neos }) => {
     }
   }).filter(item => item.distance > 0 && item.velocity > 0)
 
-  const CustomTooltip = ({ active, payload, label }: {active?: boolean; payload?: any[]; label?: string}) => {
+  const CustomTooltip = ({ active, payload, label }: {active?: boolean; payload?: Array<{dataKey: string; value: number; color: string}>; label?: string}) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-3 border rounded-lg shadow-lg">
@@ -69,7 +69,7 @@ export const NEOComparison: React.FC<NEOComparisonProps> = ({ neos }) => {
     return null
   }
 
-  const ScatterTooltip = ({ active, payload }: {active?: boolean; payload?: any[]}) => {
+  const ScatterTooltip = ({ active, payload }: {active?: boolean; payload?: Array<{payload: {name: string; distance: number; velocity: number; diameter: number; hazardous: boolean}}>}) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload
       return (

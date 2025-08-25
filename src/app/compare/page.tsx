@@ -13,7 +13,7 @@ import { nasaApi } from '@/services/nasa-api'
 import { ArrowLeft, AlertCircle } from 'lucide-react'
 
 function ComparePageContent() {
-  const { user } = useAuth()
+  const { user, isConfigured } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [neos, setNeos] = useState<NEO[]>([])
@@ -57,16 +57,16 @@ function ComparePageContent() {
       }
     }
 
-    if (user) {
-      fetchNEOsForComparison()
-    }
-  }, [user, searchParams])
+    // Allow comparison in demo mode as well
+    fetchNEOsForComparison()
+  }, [searchParams])
 
   const handleGoBack = () => {
     router.push('/')
   }
 
-  if (!user) {
+  // Only require authentication if Supabase is configured
+  if (isConfigured && !user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
         <Header />

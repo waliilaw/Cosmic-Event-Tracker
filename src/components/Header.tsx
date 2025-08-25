@@ -1,10 +1,11 @@
 'use client'
 
 import React from 'react'
+import { motion } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Rocket, User, LogOut } from 'lucide-react'
+import { Rocket, User, LogOut, Sparkles } from 'lucide-react'
 
 interface HeaderProps {
   selectedCount?: number
@@ -23,38 +24,88 @@ export const Header: React.FC<HeaderProps> = ({ selectedCount = 0, onCompareClic
   }
 
   return (
-    <header className="bg-gradient-to-r from-blue-900 to-purple-900 text-white shadow-lg">
+    <motion.header 
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50"
+    >
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Rocket className="h-8 w-8" />
-            <div>
-              <h1 className="text-2xl font-bold">Cosmic Event Tracker</h1>
-              <p className="text-blue-200 text-sm">Near-Earth Objects & Space Events</p>
+          {/* Logo Section */}
+          <motion.div 
+            className="flex items-center space-x-3"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+          >
+            <div className="relative">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center"
+              >
+                <Rocket className="h-5 w-5 text-white" />
+              </motion.div>
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="absolute -top-1 -right-1 w-3 h-3 bg-sky-500 rounded-full"
+              />
             </div>
-          </div>
+            <div>
+              <h1 className="text-xl font-bold text-slate-900 font-space-grotesk">
+                Cosmic Event Tracker
+              </h1>
+              <p className="text-sm text-slate-500 italic font-light">
+                Near-Earth Objects & Space Events
+              </p>
+            </div>
+          </motion.div>
 
+          {/* Actions Section */}
           <div className="flex items-center space-x-4">
+            {/* Compare Section */}
             {selectedCount > 0 && (
-              <div className="flex items-center space-x-2">
-                <Badge variant="secondary" className="bg-white text-blue-900">
-                  {selectedCount} selected
-                </Badge>
+              <motion.div 
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                className="flex items-center space-x-3"
+              >
+                <motion.div
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-sky-50 text-sky-700 border-sky-200 px-3 py-1 font-medium"
+                  >
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    {selectedCount} selected
+                  </Badge>
+                </motion.div>
                 <Button
                   onClick={onCompareClick}
-                  variant="outline"
-                  className="bg-white text-blue-900 hover:bg-blue-50"
+                  size="sm"
+                  className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 font-medium shadow-cosmic"
                 >
-                  Compare
+                  Compare Objects
                 </Button>
-              </div>
+              </motion.div>
             )}
 
+            {/* User Section */}
             {user ? (
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2">
-                  <User className="h-4 w-4" />
-                  <span className="text-sm">
+              <motion.div 
+                initial={{ x: 20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                className="flex items-center space-x-3"
+              >
+                <div className="flex items-center space-x-2 bg-slate-50 rounded-lg px-3 py-2">
+                  <div className="w-7 h-7 bg-sky-100 rounded-full flex items-center justify-center">
+                    <User className="h-4 w-4 text-sky-600" />
+                  </div>
+                  <span className="text-sm font-medium text-slate-700">
                     {user.user_metadata?.name || user.email?.split('@')[0] || 'User'}
                   </span>
                 </div>
@@ -62,20 +113,26 @@ export const Header: React.FC<HeaderProps> = ({ selectedCount = 0, onCompareClic
                   onClick={handleSignOut}
                   variant="outline"
                   size="sm"
-                  className="bg-white text-blue-900 hover:bg-blue-50"
+                  className="border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 >
                   <LogOut className="h-4 w-4 mr-1" />
                   Sign Out
                 </Button>
-              </div>
+              </motion.div>
             ) : (
-              <div className="text-sm text-blue-200">
-                Please sign in to access all features
-              </div>
+              <motion.div
+                initial={{ x: 20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                className="text-sm text-slate-500 italic"
+              >
+                <span className="bg-amber-50 text-amber-700 px-3 py-1 rounded-lg border border-amber-200">
+                  Demo Mode Active
+                </span>
+              </motion.div>
             )}
           </div>
         </div>
       </div>
-    </header>
+    </motion.header>
   )
 }
